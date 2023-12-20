@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.remake.mapper.CoachMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.remake.entry.Coach">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="email" column="email" jdbcType="VARCHAR"/>
+            <result property="advance" column="advance" jdbcType="VARCHAR"/>
+            <result property="firstname" column="firstname" jdbcType="VARCHAR"/>
+            <result property="lastname" column="lastname" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,phone,
+        email,advance,firstname,
+        lastname
+    </sql>
+    <select id="searchCoach" resultType="com.example.remake.entry.Coach">
+        select *
+        from Coach
+        where name like concat('%', #{name}, '%');
+    </select>
+
+    <resultMap id="coachCustomerCountResultMap" type="com.example.remake.vo.CCustomerNum">
+        <id column="name" property="name"/>
+        <result column="customer_count" property="customers_num"/>
+    </resultMap>
+
+    <select id="culPerson" resultMap="coachCustomerCountResultMap">
+        SELECT coach.name, COUNT(customer.id) AS customer_count,coach.firstname,coach.lastname
+        FROM coach
+                 LEFT JOIN customer ON coach.id = customer.coach_id
+        GROUP BY coach.name,
+                 coach.firstname,coach.lastname;
+    </select>
+
+
+    <resultMap id="CoachRslMap" type="com.example.remake.vo.CoachIncome">
+        <!-- 1.匹配Coach属性 -->
+        <id column="coach_id" property="id"></id>
+        <result column="coach_name" property="name"/>
+        <result column="total_price" property="income"/>
+        <result column="coach_firstname" property="PTFirstName"/>
+        <result column="coach_lastname" property="PTLastName"/>
+        <!--2.匹配Coach的Customer-->
+        <collection property="customerfee" ofType="com.example.remake.vo.CustomerFee">
+            <id column="customer_id" property="id"></id>
+            <result column="customer_name" property="name"/>
+            <result column="level" property="level"/>
+            <result column="total_price" property="price"/>
+            <result column="customer_lastname" property="lastname"/>
+            <result column="customer_firstname" property="firstname"/>
+        </collection>
+    </resultMap>
+
+    <select id="getCoachIncome" resultMap="CoachRslMap">
+        SELECT
+            coach.id AS coach_id,
+            coach.name AS coach_name,
+            coach.lastname AS coach_firstname,
+            coach.firstname AS coach_lastname,
+            customer.id AS customer_id,
+            customer.name AS customer_name,
+            customer.lastname AS customer_lastname,
+            customer.firstname AS customer_firstname,
+            plan.level AS level,
+            SUM(plan.price) AS total_price
+        FROM
+            customer
+                JOIN plan ON plan.id = customer.plan_id
+                JOIN coach ON customer.coach_id = coach.id
+        GROUP BY
+            coach.id,
+            coach.name,
+            customer.id,
+            customer.name,
+            plan.level,
+            customer.lastname,
+            customer.firstname,
+            coach.lastname,
+            coach.firstname;
+    </select>
+    <select id="searchCoachId" resultType="java.lang.Integer">
+        SELECT id FROM coach WHERE name = #{coachName}
+    </select>
+    <select id="selectName" resultType="java.lang.String">
+        SELECT name FROM coach WHERE id = #{coachId}
+    </select>
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.remake.mapper.CustomerMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.remake.entry.Customer">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="firstname" column="firstname" jdbcType="VARCHAR"/>
+            <result property="lastname" column="lastname" jdbcType="VARCHAR"/>
+            <result property="address" column="address" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="email" column="email" jdbcType="VARCHAR"/>
+            <result property="birthday" column="birthday" jdbcType="DATE"/>
+            <result property="exercisehistory" column="exercisehistory" jdbcType="VARCHAR"/>
+            <result property="fitness" column="fitness" jdbcType="VARCHAR"/>
+            <result property="medicalhistory" column="medicalhistory" jdbcType="VARCHAR"/>
+            <result property="coachId" column="coach_id" jdbcType="INTEGER"/>
+            <result property="planId" column="plan_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,firstname,
+        lastname,address,phone,
+        email,birthday,exercisehistory,
+        fitness,medicalhistory,coach_id,
+        plan_id
+    </sql>
+
+    <insert id="insertCustomer" parameterType="com.example.remake.entry.Customer">
+        INSERT INTO customer (name, firstname, lastname, address, phone, email, fitness,birthday, exercisehistory, medicalhistory, coach_id, plan_id)
+        VALUES (#{name}, #{firstname}, #{lastname}, #{address}, #{phone}, #{email}, #{fitness},#{birthday}, #{exercisehistory}, #{medicalhistory}, #{coachId}, #{planId});
+    </insert>
+
+
+    <select id="OverAge" resultType="com.example.remake.entry.Customer">
+        SELECT EXTRACT(YEAR FROM age(birthday)) AS age, id, firstname,lastname,email, birthday,address,name
+        FROM customer
+        WHERE EXTRACT(YEAR FROM age(birthday)) > #{age};
+    </select>
+    <select id="getHealthPerson" resultType="com.example.remake.entry.Customer">
+        SELECT *
+        FROM customer c
+                 JOIN plan p ON c.plan_id = p.id
+        WHERE c.fitness IN ('Good', 'Medium')
+          AND p.level = 'Gold';
+    </select>
+    <select id="getTeenage" resultType="com.example.remake.entry.Customer">
+        select *
+        FROM customer
+        WHERE EXTRACT(YEAR FROM age(birthday)) &lt; 18;
+    </select>
+</mapper>

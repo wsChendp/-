@@ -1,0 +1,22 @@
+
+spring:
+  datasource:
+
+    url: jdbc:postgresql://192.168.222.134:5432/Remake #    url: jdbc:mysql://localhost:3306/tis?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: postgres
+    password: postgres
+    driverClassName: org.postgresql.Driver
+  jackson:
+    time-zone: GMT+8
+server:
+  port: 14250
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+    logging:
+      level:
+        com.example.mapper: DEBUG
+#  reference the xml that springboot can recognize the config;
+#  all xml
